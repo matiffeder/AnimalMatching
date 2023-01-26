@@ -3,6 +3,7 @@
 <!--after / we can add a router-->
 <!--if I del it it will show there is nothing in the address-->
 @page "/"
+<!--the datebase to use timer-->
 @using System.Timers
 
 <style>
@@ -16,109 +17,111 @@
     }
 
     /*is there a for loop way like we did for animal card to create these?*/
-    #Button0 {
+    /*A: use the style tag in html*/
+    /*#Button0 {
         opacity: @opacityBtn[0];
     }
     #Button1 {
         opacity: @opacityBtn[1];
     }
-    #Button2 {
-        opacity: @opacityBtn[2];
-    }
-    #Button3 {
-        opacity: @opacityBtn[3];
-    }
-    #Button4 {
-        opacity: @opacityBtn[4];
-    }
-    #Button5 {
-        opacity: @opacityBtn[5];
-    }
-    #Button6 {
-        opacity: @opacityBtn[6];
-    }
-    #Button7 {
-        opacity: @opacityBtn[7];
-    }
-    #Button8 {
-        opacity: @opacityBtn[8];
-    }
-    #Button9 {
-        opacity: @opacityBtn[9];
-    }
-    #Button10 {
-        opacity: @opacityBtn[10];
-    }
-    #Button11 {
-        opacity: @opacityBtn[11];
-    }
-    #Button12 {
-        opacity: @opacityBtn[12];
-    }
-    #Button13 {
-        opacity: @opacityBtn[13];
-    }
-    #Button14 {
-        opacity: @opacityBtn[14];
-    }
+
+    ......
+
     #Button15 {
         opacity: @opacityBtn[15];
-    }
+    }*/
 
     /*.timer {
-        display: flex;
-        justify-content: center;
+            display: flex;
+            justify-content: center;
     }*/
+
+    /*on mouse down to change the color*/
     #start:active {
         background-color: #fff;
     }
     #secondsInput {
-        width: 250px;
+        width: 270px;
     }
 </style>
 
 <div class="container">
-    <div>
+    <div class="row">
         <!--https://bootstrap5.hexschool.com/docs/5.0/components/buttons/-->
-        <button type="button" id="reset" class="btn btn-primary btn-sm" @onclick="() => SetUpGame()">Reset</button>
+        <!--btn-primary is the style, btn-sm is small btn-->
+        <!--@onclick="() => SetUpGame()  :  use # to run a func-->
+        <!--it seems that there are 12 col, col-sm-6 means occupy 6 parts-->
+        <!--col-sm means small col-->
+        <div class="col-sm-2">
+            <button type="button" id="reset" class="btn btn-primary btn-sm" @onclick="() => SetUpGame()">Reset</button>
+        </div>
+        <div class="col-sm">
+            <!--display:flex needs height to set the position, align-items for vertical, justify-content for horizontal-->
+            <h6 style="height:30px; display:flex; align-items:center; justify-content:center">Top Score: @topScore</h6>
+        </div>
+        <div class="col-sm">
+            <!--@showFinal  :  use a value to define the arrtibute-->
+            <!--title tag for a mouse over desc-->
+            <h6 style="opacity:@showFinal; height:30px; display:flex; align-items:center; justify-content:right" title="Final Score = Matched Score - (Elapsed Time * 10)">Final Score: @(score - tenthsOfSecondsElapsed)</h6>
+        </div>
     </div>
     <div>
-        <input type="number" id="secondsInput" min="1" placeholder="Set the seconds to remember" @onchange="TimerSeconds" disabled=@disableInput>
+        <!--maxlength="2" not supports Chrome when the type is number-->
+        <!--placeholder to show a desc-->
+        <!--seems the same, if there is no arg:  @onchange="TimerSeconds"   and  @onchange="() => TimerSeconds()"-->
+        <input type="number" maxlength="2" id="secondsInput" min="1" max="10" placeholder="Seconds to remember (1-10)" @onchange="TimerSeconds" disabled=@disableInput>
         <button type="button" id="start" @onclick="() => StartTimer()">Play Now!</button>
     </div>
     <div>
-        <h5>The game will start in: @countDown seconds</h5>
+        <h6>The game will start in: @countDown seconds</h6>
     </div>
     <div class="row">
         <!--"at" is the code for run C#-->
         <!--do not use var in js but here-->
         @for (var index = 0; index < shuffledAnimals.Count; index++)
         {
+            //for showing shuffled Animals cards by id
             var animal = shuffledAnimals[index];
             //use $ to show a value in string
             var uniqueDesc = $"Button{index}";
-            //this is needed for give value in AnimalClick, but why?
+            //this is needed for giving value to AnimalClick
+            //since when we call AnimalClick, the for loop had run to the end
             int id = index;
             <div class="col-3">
                 <button @onclick="@(() => AnimalClick(animal, id))"
                         type="button" class="animalCard btn btn-outline-dark" disabled=@disableBtn[id]>
-                    <h1 class="animalFace" id=@uniqueDesc>@animal</h1>
+                    <!--Used a style tag here to avoid repeating CSS-->
+                    <h1 class="animalFace" id=@uniqueDesc style="opacity:@opacityBtn[id]">@animal</h1>
                 </button>
             </div>
         }
     </div>
     <div class="row">
-        <!--it seems that there are 12 col, col-sm-6 means occupy 6 part-->
-        <div class="col-sm-6">
-            <h6>Matched: @matchedNum / 8</h6>
+        <div class="col-sm-3">
+            <p style="font-size:6px">Matched: @matchedNum/8</p>
         </div>
-        <div class="col-sm-6">
-            <h6>Time elapsed: @timeDisplay</h6>
+        <div class="col-sm-5">
+            <p style="font-size:6px; text-align:center;">Matched Score: @score</p>
+        </div>
+        <div class="col-sm">
+            <p style="font-size:6px; text-align:right;">Elapsed: @timeDisplay</p>
         </div>
     </div>
 </div>
 
 @code {
+    //can't write file by this way
+    //@inject HttpClient Http
+    //int topScore = 0;
+    //override original OnInitializedAsync and add the read local file ability
+    /*protected override async Task OnInitializedAsync()
+        {
+        var s = await Http.GetStringAsync("record.txt");
+        topScore = Int32.Parse(s);
+    }*/
+    //the other way to save file is using cookie, but I need to take time to know how cookie work instead of just copy paste
+
+    //defult animal list
     List<string> animalEmojis = new List<string>()
 {
         "🐶","🐶",
@@ -130,38 +133,48 @@
         "🐷","🐷",
         "🐼","🐼",
     };
+    //shuffled animal list
     List<string> shuffledAnimals = new List<string>();
 
-    int[] opacityBtn = new int[16];
-
-    //string opacityAll = "0";
-    //bool disableBtn = true;
-    //bool in C# seems can't use 1 or 0
+    //create bool array with 16 itmes
     bool[] disableBtn = new bool[16];
+    //bool in C# seems can't use 1 or 0
     bool disableInput = false;
+    int[] opacityBtn = new int[16];
     int matchedNum = 0;
+    //timer for elapsed
     Timer timer;
+    //timer for countdown
     Timer timerMem;
     int tenthsOfSecondsElapsed = 0;
     string timeDisplay = "0.0";
-    int secondsMem = 10;
-    int countDown = 10;
+    int secondsMem = 1;
+    int countDown = 1;
+    //int? means can be null
+    int score = 0;
+    int showFinal = 0;
+    int topScore = 0;
+    //string topScore = File.ReadAllText("record.txt");
     //I can't not put Array.Fill here, why?
 
     //protected is: its child able to get variable from the func, void is no returen
+    //read defult value and timers at the begining
     protected override void OnInitialized()
     {
         //1000 interval = 1 second, 100 interval = 0.1 second
         timer = new Timer(100);
+        //the way to run timer
         timer.Elapsed += Timer_Tick;
         timerMem = new Timer(1000);
         timerMem.Elapsed += TimerMem_Tick;
         SetUpGame();
     }
+    //defult values of the game
     private void SetUpGame()
     {
         //first random is type of data
         Random random = new Random();
+        //change the order by the radom function and add to shuffledAnimals list
         shuffledAnimals = animalEmojis.OrderBy(item => random.Next())
                                       .ToList();
         matchedNum = 0;
@@ -171,121 +184,189 @@
         timer.Stop();
         timeDisplay = "0.0";
         disableInput = false;
+        score = 0;
+        showFinal = 0;
         //set all values in opacityBtn as 0
         //same as for loop
         /*for (var i=0; i<16; i++)
-        {
+            {
             opacityBtn[i] = 0;
         }*/
         //why Array.Fill can only write in a function?
         Array.Fill(opacityBtn, 0);
+        //user can only click on cards after countdown, disable now
         Array.Fill(disableBtn, true);
-        //where can I see the output?
-        Console.WriteLine("[[[[[[[[[[[[[[[[[[[[[[[");
     }
 
     //string.Empty almost the same as ""
+    //string lastAnimal = "";
     string lastAnimal = string.Empty;
+    //use -1 to make sure it is not a card in the deck
     int lastID = -1;
     int lastID2 = -1;
     bool matched = false;
-    //string lastAnimal = "";
+    //click on the card and get animal face and id
     private void AnimalClick(string currentAnimal, int currentID)
     {
+        //show the card after click on the card
         opacityBtn[currentID] = 1;
+        //if never click a card or after not match
         if (lastAnimal == string.Empty)
-        //if (lastAnimal == "")
         {
             //do not move to bottom else, because this is another condition. the card will hide by the third click
+            //make sure there are lastID and lastID2
             if (matched == false && lastID != -1 && lastID2 != -1)
             {
+                //if not matched, hide the previous cards
                 opacityBtn[lastID] = 0;
                 opacityBtn[lastID2] = 0;
             }
+            //show the current card
             opacityBtn[currentID] = 1;
+            //record the current card face
             lastAnimal = currentAnimal;
+            //record the current card id
             lastID = currentID;
         }
+        //if clicked two matched cards
         else if (lastAnimal == currentAnimal && currentID != lastID)
         {
+            //reset the card matching
             lastAnimal = string.Empty;
+            //replace matched cards with ✔️
             shuffledAnimals = shuffledAnimals.Select(a => a.Replace(currentAnimal, "✔️"))
                                              .ToList();
+            //disable matched cards to avoid run other features
             disableBtn[currentID] = true;
             disableBtn[lastID] = true;
+            //matched card num +1
             matchedNum++;
+            //record the matched state to check and then hide cards when need
             matched = true;
+            //if secondsMem (countdown timer) is 1 then one match get 1000 points
+            //if secondsMem is 2 then one match get 900 points...
+            score += 1100 - (secondsMem) * 100;
+            //if the game finished
             if (matchedNum == 8)
             {
                 timer.Stop();
-                //timeDisplay += " - Play Again?";
-                //SetUpGame();
+                //show the final score, it hides because we don't know Elapsed Time
+                showFinal = 1;
+                //the final score is score - tenthsOfSecondsElapsed, I wrote in html
+                //record the highest score
+                //tenthsOfSecondsElapsed = Elapsed Time in sec * 10
+                if (score - tenthsOfSecondsElapsed > topScore)
+                {
+                    topScore = score - tenthsOfSecondsElapsed;
+                }
             }
         }
         else
         {
+            //if not matched
             //if click on the same card
             if (currentID == lastID)
             {
+                //hide the card
                 opacityBtn[lastID] = 0;
             }
+            //reset the card matching
             lastAnimal = string.Empty;
+            //record the not matched cards and then hide them on next click
+            //cannot hide them right now since you will not see what you click
             lastID2 = lastID;
             lastID = currentID;
+            //record the matched state to check and then hide cards
             matched = false;
+            //score = score -100
+            score -= 100;
         }
         //simple way for book's code, can also use for my code but it is better to show it in 3 parts
         /* else
         {
-            if (lastAnimal == currentAnimal)
+        if (lastAnimal == currentAnimal)
             {
             shuffledAnimals = shuffledAnimals.Select(a => a.Replace(currentAnimal, ""))
-                                             .ToList();
-            }
-            lastAnimal = "";
-        }*/
+        .ToList();
+        }
+        lastAnimal = "";
+    }*/
     }
+
+    //elapsed timer, will keep update by the setting above
     private void Timer_Tick(Object source, ElapsedEventArgs e)
     {
         InvokeAsync(() =>
         {
-            tenthsOfSecondsElapsed++;
-            timeDisplay = (tenthsOfSecondsElapsed / 10F).ToString("0.0s");
-            StateHasChanged();
+        //update and add the elapsed time, the time * 10 is second
+        tenthsOfSecondsElapsed++;
+        //10F change string number to X.X
+        //100F change string number to X.XX
+        timeDisplay = (tenthsOfSecondsElapsed / 10F).ToString("0.0s");
+        //update the state
+        StateHasChanged();
         });
     }
+    //countdown timer, will keep update by the setting above
     private void TimerMem_Tick(Object source, ElapsedEventArgs e)
     {
         InvokeAsync(() =>
         {
-            countDown--;
-            if (countDown == 0)
+        //update and minus the countdown time, the time is second
+        countDown--;
+        //countdown end
+        if (countDown == 0)
             {
-                timerMem.Stop();
-                timer.Start();
-                Array.Fill(opacityBtn, 0);
-                Array.Fill(disableBtn, false);
+            //stop countdown timer
+            timerMem.Stop();
+            //start elapsed timer
+            timer.Start();
+            //hide all cards by html style
+            Array.Fill(opacityBtn, 0);
+            //enble all cards by html style
+            Array.Fill(disableBtn, false);
             //disableBtn = false;
-            //do I need to break the function? Is it a func that always running? Will it stop after use Timer.Stop()?
         }
             StateHasChanged();
-        });
+        //do I need to break the function? Is it a func that always running? Will it stop after use Timer.Stop()?
+        //A: no, since the Console.WriteLine stop showing after Timer.Stop()
+        //Console.WriteLine("---------------------------TimerMem_Tick");
+    });
     }
+    //get the cpuntdown seconds that user set
     private void TimerSeconds(ChangeEventArgs e)
     {
-        secondsMem = countDown = Int16.Parse(e.Value.ToString());
-        if (Int16.Parse(e.Value.ToString()) < 1)
+        //check if user type number, if not number then secondsMem will be 1
+        secondsMem = int.TryParse(e.Value.ToString(), out int nouse) ? Int16.Parse(e.Value.ToString()) : 1;
+        //secondsMem cannot smaller than 1
+        if (secondsMem <= 1)
         {
+            //force the secondsMem to be 1 if it is too small
             secondsMem = countDown = 1;
             //not working, why?
             //e.Value = 1;
+            //able to use <input value="@secondsMem"
+            //but after users enter some values that <=1 twice it will also not working
+            //might because the value are 1s, it didn't change (onchange)
+        }
+        //secondsMem cannot smaller than 1
+        else if (secondsMem > 10)
+        {
+            //force the secondsMem to be 1 if it is bigger than 10
+            secondsMem = countDown = 10;
+            //e.Value = 10;
         }
     }
+    //click on play now button
     private void StartTimer()
     {
+        //set default
         SetUpGame();
+        //start countdown
         timerMem.Start();
+        //show the cards
         Array.Fill(opacityBtn, 1);
+        //disable input field to avoid get unecessary value
         disableInput = true;
     }
 }
