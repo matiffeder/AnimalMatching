@@ -10,6 +10,7 @@
     .container {
         width: 400px;
     }
+
     .animalCard {
         width: 100px;
         height: 100px;
@@ -19,27 +20,28 @@
     /*is there a for loop way like we did for animal card to create these?*/
     /*A: use the style tag in html*/
     /*#Button0 {
-        opacity: @opacityBtn[0];
-    }
-    #Button1 {
-        opacity: @opacityBtn[1];
-    }
+            opacity: @opacityBtn[0];
+        }
+        #Button1 {
+            opacity: @opacityBtn[1];
+        }
 
-    ......
+        ......
 
-    #Button15 {
-        opacity: @opacityBtn[15];
-    }*/
+        #Button15 {
+            opacity: @opacityBtn[15];
+        }*/
 
     /*.timer {
-            display: flex;
-            justify-content: center;
-    }*/
+                display: flex;
+                justify-content: center;
+        }*/
 
     /*on mouse down to change the color*/
     #start:active {
         background-color: #fff;
     }
+
     #secondsInput {
         width: 270px;
     }
@@ -83,7 +85,7 @@
             //for showing shuffled Animals cards by id
             var animal = shuffledAnimals[index];
             //use $ to show a value in string
-            var uniqueDesc = $"Button{index}";
+            //var uniqueDesc = $"Button{index}";
             //this is needed for giving value to AnimalClick
             //since when we call AnimalClick, the for loop had run to the end
             int id = index;
@@ -91,7 +93,7 @@
                 <button @onclick="@(() => AnimalClick(animal, id))"
                         type="button" class="animalCard btn btn-outline-dark" disabled=@disableBtn[id]>
                     <!--Used a style tag here to avoid repeating CSS-->
-                    <h1 class="animalFace" id=@uniqueDesc style="opacity:@opacityBtn[id]">@animal</h1>
+                    <h1 class="animalFace" style="opacity:@opacityBtn[id]">@animal</h1>
                 </button>
             </div>
         }
@@ -337,7 +339,7 @@
     private void TimerSeconds(ChangeEventArgs e)
     {
         //check if user type number, if not number then secondsMem will be 1
-        secondsMem = int.TryParse(e.Value.ToString(), out int nouse) ? Int16.Parse(e.Value.ToString()) : 1;
+        secondsMem = countDown = int.TryParse(e.Value.ToString(), out int nouse) ? Int16.Parse(e.Value.ToString()) : 1;
         //secondsMem cannot smaller than 1
         if (secondsMem <= 1)
         {
