@@ -91,8 +91,9 @@
             int id = index;
             <div class="col-3">
                 <button @onclick="@(() => AnimalClick(animal, id))"
-                        type="button" class="animalCard btn btn-outline-dark" disabled=@disableBtn[id]>
+                    type="button" class="animalCard btn btn-outline-dark" disabled=@disableBtn[id]>
                     <!--Used a style tag here to avoid repeating CSS-->
+                    <!--<h1 class="animalFace" id=@uniqueDesc style="opacity:@opacityBtn[id]">@animal</h1>-->
                     <h1 class="animalFace" style="opacity:@opacityBtn[id]">@animal</h1>
                 </button>
             </div>
@@ -212,18 +213,18 @@
     {
         //show the card after click on the card
         opacityBtn[currentID] = 1;
-        //if never click a card or after not match
+        //if never click a card or after a pair (matched and not matched)
         if (lastAnimal == string.Empty)
         {
-            //do not move to bottom else, because this is another condition. the card will hide by the third click
+            //do not move to the bottom "else", because this is another condition. the card will hide by the third click
             //make sure there are lastID and lastID2
-            if (matched == false && lastID != -1 && lastID2 != -1)
+            if (!matched && lastID != -1 && lastID2 != -1)
             {
                 //if not matched, hide the previous cards
                 opacityBtn[lastID] = 0;
                 opacityBtn[lastID2] = 0;
             }
-            //show the current card
+            //show the current card if current card is last card (it is hidden by the above condition)
             opacityBtn[currentID] = 1;
             //record the current card face
             lastAnimal = currentAnimal;
@@ -251,6 +252,7 @@
             //if the game finished
             if (matchedNum == 8)
             {
+                disableInput = false;
                 timer.Stop();
                 //show the final score, it hides because we don't know Elapsed Time
                 showFinal = 1;
@@ -300,13 +302,13 @@
     {
         InvokeAsync(() =>
         {
-        //update and add the elapsed time, the time * 10 is second
-        tenthsOfSecondsElapsed++;
-        //10F change string number to X.X
-        //100F change string number to X.XX
-        timeDisplay = (tenthsOfSecondsElapsed / 10F).ToString("0.0s");
-        //update the state
-        StateHasChanged();
+            //update and add the elapsed time, the time * 10 is second
+            tenthsOfSecondsElapsed++;
+            //10F change string number to X.X
+            //100F change string number to X.XX
+            timeDisplay = (tenthsOfSecondsElapsed / 10F).ToString("0.0s");
+            //update the state
+            StateHasChanged();
         });
     }
     //countdown timer, will keep update by the setting above
@@ -314,26 +316,26 @@
     {
         InvokeAsync(() =>
         {
-        //update and minus the countdown time, the time is second
-        countDown--;
-        //countdown end
-        if (countDown == 0)
+            //update and minus the countdown time, the time is second
+            countDown--;
+            //countdown end
+            if (countDown == 0)
             {
-            //stop countdown timer
-            timerMem.Stop();
-            //start elapsed timer
-            timer.Start();
-            //hide all cards by html style
-            Array.Fill(opacityBtn, 0);
-            //enble all cards by html style
-            Array.Fill(disableBtn, false);
-            //disableBtn = false;
-        }
+                //stop countdown timer
+                timerMem.Stop();
+                //start elapsed timer
+                timer.Start();
+                //hide all cards by html style
+                Array.Fill(opacityBtn, 0);
+                //enble all cards by html style
+                Array.Fill(disableBtn, false);
+                //disableBtn = false;
+            }
             StateHasChanged();
-        //do I need to break the function? Is it a func that always running? Will it stop after use Timer.Stop()?
-        //A: no, since the Console.WriteLine stop showing after Timer.Stop()
-        //Console.WriteLine("---------------------------TimerMem_Tick");
-    });
+            //do I need to break the function? Is it a func that always running? Will it stop after use Timer.Stop()?
+            //A: no, since the Console.WriteLine stop showing after Timer.Stop()
+            //Console.WriteLine("---------------------------TimerMem_Tick");
+        });
     }
     //get the cpuntdown seconds that user set
     private void TimerSeconds(ChangeEventArgs e)
